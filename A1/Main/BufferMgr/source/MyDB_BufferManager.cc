@@ -44,6 +44,7 @@ void MyDB_BufferManager :: unpin (MyDB_PageHandle unpinMe) {
 }
 
 MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, string tempFile) {
+	//page size
 	_pageSize = pageSize;
 	_numPages = numPages;
 	_tempFile = tempFile;
