@@ -28,6 +28,7 @@ private:
   bool _hitBit;
   //LRU POS
   //data loc
+    //balab
 }
 
 #endif
