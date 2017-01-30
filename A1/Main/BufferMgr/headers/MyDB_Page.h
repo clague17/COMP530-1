@@ -1,14 +1,19 @@
 #ifndef PAGE_H
 #define PAGE_H
 #include <string>
-#include <MyDB_BufferManager.h>
+//#include "MyDB_BufferManager.h"
 
 using namespace std;
+
+class MyDB_BufferManager;
+class MyDB_Table;
 class MyDB_Page;
 typedef shared_ptr <MyDB_Page> MyDB_PagePtr;
+typedef shared_ptr<MyDB_BufferManager> MyDB_BufferManagerPtr;
+typedef shared_ptr<MyDB_Table> MyDB_TablePtr;
 
 class MyDB_Page {
-
+    
 public:
     // Mark the dirty bit
     void markDirty();
@@ -57,12 +62,12 @@ public:
     
     // Buffer the data from file to RAM
     void buffer();
-
+    
     // write the data back to file
     void writeBack();
     
-    MyDB_Page(MyDB_BufferManagerPtr bufferManager, pair<MyDB_TablePtr, int> addressinStorage);
-
+    MyDB_Page(MyDB_BufferManagerPtr bufferManager, pair<MyDB_TablePtr, int> const addressinStorage);
+    
     ~MyDB_Page();
     
 private:
@@ -98,6 +103,6 @@ private:
     
     // the buffer manager
     MyDB_BufferManagerPtr _bufferManager;
-}
+};
 
 #endif

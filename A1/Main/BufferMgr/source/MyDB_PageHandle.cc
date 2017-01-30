@@ -6,16 +6,14 @@
 #include "MyDB_PageHandle.h"
 
 void *MyDB_PageHandleBase :: getBytes () {
-	return nullptr;
+    return nullptr;
 }
 
 void MyDB_PageHandleBase :: wroteBytes () {
 }
 
-MyDB_PagePtr MyDB_PageHandleBase :: getPagePointer() {
-}
-
 MyDB_PageHandleBase :: MyDB_PageHandleBase (MyDB_PagePtr pagePointer) {
+    _pagePointer = pagePointer;
 }
 
 MyDB_PageHandleBase :: ~MyDB_PageHandleBase () {

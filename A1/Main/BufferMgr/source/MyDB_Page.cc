@@ -7,19 +7,19 @@
 using namespace std;
 
 void MyDB_Page :: markDirty() {
-  _dirty = true;
+    _dirtyBit = true;
 }
 
 void MyDB_Page :: unmarkDirty() {
-  _dirty = false;
+    _dirtyBit = false;
 }
 
 void MyDB_Page :: markHit() {
-  _hitByte = true;
+    _hitBit = true;
 }
 
 void MyDB_Page :: unmarkHit() {
-  _hitByte = false;
+    _hitBit = false;
 }
 
 void MyDB_Page :: markBuffer() {
@@ -31,15 +31,15 @@ void MyDB_Page :: unmarkBuffer() {
 }
 
 void MyDB_Page :: markPin() {
-    _PinBit = true;
+    _pinBit = true;
 }
 
 void MyDB_Page :: unmarkPin() {
-    _PinBit = false;
+    _pinBit = false;
 }
 
 bool MyDB_Page :: isDirty() {
-    return _dirty;
+    return _dirtyBit;
 }
 
 bool MyDB_Page :: isBuffered() {
@@ -47,7 +47,7 @@ bool MyDB_Page :: isBuffered() {
 }
 
 bool MyDB_Page :: isPinned() {
-    return _PinBit;
+    return _pinBit;
 }
 
 string MyDB_Page :: getPageID() {
@@ -68,20 +68,21 @@ void MyDB_Page :: decRefCounter() {
     }
 }
 
-void buffer() {
+void MyDB_Page :: buffer() {
     // Code
 }
 
-void writeBack() {
+void MyDB_Page :: writeBack() {
     // Code
 }
 
-MyDB_Page :: MyDB_Page () {
-  _dirty = false;
-  _hitByte = false;
+MyDB_Page :: MyDB_Page(MyDB_BufferManagerPtr bufferManager, pair<MyDB_TablePtr, int> const addressinStorage)
+{
+    _dirtyBit = false;
+    _hitBit = false;
 }
 
 MyDB_Page :: ~MyDB_Page () {
-
+    
 }
 #endif
