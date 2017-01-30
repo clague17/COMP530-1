@@ -4,10 +4,18 @@
 
 #include "MyDB_PageHandle.h"
 #include "MyDB_Table.h"
-#include "MyDB_page.h"
+#include "MyDB_Page.h"
+#include "MyDB_LRUTable.h"
+
+#include <vector>
 #include <unordered_map>
 
 using namespace std;
+
+class MyDB_BufferManager;
+typedef shared_ptr<MyDB_BufferManager> MyDB_BufferManagerPtr ;
+typedef unordered_map<long, MyDB_PagePtr> id_to_PagePtr_map;
+
 
 class MyDB_BufferManager {
 
@@ -49,15 +57,21 @@ public:
 	// and any temporary files need to be deleted
 	~MyDB_BufferManager ();
 
-	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS
-
+    void allocBuffer (MyDB_PagePtr pagePtr);
+    
+    
 private:
 
 	// YOUR STUFF HERE
 	size_t _pageSize;
 	size_t _numPages;
-	size_t _tempFile;
-	unordered_map<string, MyDB_PagePtr> _pageTable;
+	string _tempFile;
+    bool isFull;
+    vector<char*> pageFrames;
+    vector<int> availableSlots;
+	id_to_PagePtr_map _pageTable;
+    MyDB_LRUTablePtr _lruTable;
+    
 };
 
 #endif
