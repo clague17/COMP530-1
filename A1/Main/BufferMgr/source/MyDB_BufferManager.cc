@@ -25,13 +25,13 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
         << endl;
         cout << "Create a handle and returned."
         << endl;
-        
+
         cout<<"[MyDB_BufferManager :: getPage] "<<"the page pointer is";
         cout<< it->second <<endl;
         MyDB_PagePtr pagePtr = it->second;
-        
+
         cout<<"[MyDB_BufferManager :: getPage] "<<"get page pointer"<<endl;
-        
+
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
     //key doesn't exists, create a new handle of the page object and return it
@@ -71,13 +71,13 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
         << endl;
         cout << "Create a handle and returned."
         << endl;
-        
+
         MyDB_PagePtr pagePtr = it->second;
         cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"the page pointer is " << it->second <<endl;
         cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"the page pointer is " << pagePtr <<endl;
-       
+
         pagePtr -> markPin();
-        
+
         cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"mark Pin";
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
@@ -89,19 +89,19 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
         << " is not in the page table." << endl;
         cout << "Made a new page Object returned a handle to it."
         << endl;
-        
+
         cout<< "[MyDB_BufferManager :: getPinnedPage] " << "Create a page object"<<endl;
         MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(this, make_pair(whichTable->getStorageLoc(), i), pageID, false);
-        
+
         cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"the page pointer is " << pagePtr <<endl;
 
-        
+
         cout<< "[MyDB_BufferManager :: getPinnedPage] " << "markPin" <<endl;
         pagePtr->markPin();
-        
+
         cout<< "[MyDB_BufferManager :: getPinnedPage] " << "insert into lookup table" <<endl;
         _pageTable[pageID] = pagePtr;
-        
+
         cout<< "[MyDB_BufferManager :: getPinnedPage] " << "return a page handle"<<endl;
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
@@ -168,24 +168,24 @@ void MyDB_BufferManager:: updateLRUTable(MyDB_PagePtr pagePtr) {
 }
 
 MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, string tempFile) {
-    
+
     _pageSize = pageSize;
     _numPages = numPages;
     _tempFile = tempFile;
     tempPageIndex = 0;
-    
+
     //Initialize buffer pool (available page frames)
     for (int i = int(_numPages - 1); i >= 0; i--) {
         availablePageFrames.push_back(new char[pageSize]);
         cout<<"[MyDB_BufferManager :: MyDB_BufferManager] "<< "allocate buffer "<< &availablePageFrames.back() <<endl;
     }
-    
+
     _lruTable = make_shared<MyDB_LRUTable>();
-    
+
 }
 
 MyDB_BufferManager :: ~MyDB_BufferManager () {
-    
+
 }
 
 #endif
