@@ -102,6 +102,10 @@ pair<fileLoc, int> MyDB_Page::getAddress(){
     return _addressinStorage;
 }
 
+void MyDB_Page:: writeBack() {
+    _bufferManager -> writeBack(shared_from_this());
+}
+
 MyDB_Page :: MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous){
     cout<<"[MyDB_Page :: MyDB_Page] "<< "Calling constructor."<<endl;
     _bufferManager = bufferManager;
@@ -109,6 +113,7 @@ MyDB_Page :: MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, i
     _pageID = pageID;
     _dirtyBit = false;
     _hitBit = false;
+    _bufferBit = false;
     _anonBit = isAnonymous;
     _refCounter = 0;
 }

@@ -67,7 +67,10 @@ public:
     // write the buffer back to the file
     void writeBack(MyDB_PagePtr pagePtr);
     
+    void clearBuffer();
+    
     void updateLRUTable(MyDB_PagePtr pagePtr);
+    
     
 private:
     
