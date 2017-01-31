@@ -39,7 +39,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
         cout << "Page"
         << whichTable->getName() << " "
         << i
-        << "is not in the page table." << endl;
+        << " is not in the page table." << endl;
         cout << "Made a new page Object returned a handle to it."
         << endl;
         MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(this, make_pair(whichTable->getStorageLoc(), i), pageID, false);
