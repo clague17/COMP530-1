@@ -86,8 +86,12 @@ void MyDB_Page :: bufferMyself() {
 }
 
 void MyDB_Page :: evictMyself() {
+    if (isDirty()) {
+        _bufferManager -> writeBack(shared_from_this());
+    }
     _bufferManager -> recyclBuffer(shared_from_this());
-    _bufferBit = false;
+    _pageFrame = nullptr;
+    unmarkBuffer();
 }
 
 void MyDB_Page:: updateMyselfinLRU() {
