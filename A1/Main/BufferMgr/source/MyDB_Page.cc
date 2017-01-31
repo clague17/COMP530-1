@@ -2,6 +2,7 @@
 #define PAGE_C
 
 #include "MyDB_Page.h"
+#include "MyDB_BufferManager.h"
 #include <string>
 
 using namespace std;
@@ -50,12 +51,20 @@ bool MyDB_Page :: isPinned() {
     return _pinBit;
 }
 
+bool MyDB_Page :: isAnonymous() {
+    return _anonBit;
+}
+
+bool MyDB_Page :: hasNoCounter() {
+    return _refCounter == 0;
+}
+
 string MyDB_Page :: getPageID() {
     return _pageID;
 }
 
-int MyDB_Page :: getPageFrameIndex() {
-    return _indexofPageFrame;
+char* MyDB_Page :: getPageFrame() {
+    return  _pageFrame;
 }
 
 void MyDB_Page :: incRefCounter() {
@@ -68,18 +77,32 @@ void MyDB_Page :: decRefCounter() {
     }
 }
 
-void MyDB_Page :: buffer() {
-    // Code
+void MyDB_Page :: bufferMyself() {
+    _pageFrame = _bufferManager -> allocBuffer(shared_from_this());
+    _bufferBit = true;
+    _dirtyBit = false;
 }
 
-void MyDB_Page :: writeBack() {
-    // Code
+void MyDB_Page :: evictMyself() {
+    _bufferManager -> recyclBuffer(shared_from_this());
+    _bufferBit = false;
 }
 
-MyDB_Page :: MyDB_Page(MyDB_BufferManagerPtr bufferManager, pair<MyDB_TablePtr, int> const addressinStorage)
-{
+void MyDB_Page:: updateMyselfinLRU() {
+    _bufferManager -> updateLRUTable(shared_from_this());
+}
+
+pair<fileLoc, int> MyDB_Page::getAddress(){
+    return _addressinStorage;
+}
+
+MyDB_Page :: MyDB_Page(MyDB_BufferManagerPtr const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous){
+    _bufferManager = bufferManager;
+    _addressinStorage = addressinStorage;
+    _pageID = pageID;
     _dirtyBit = false;
     _hitBit = false;
+    _anonBit = isAnonymous;
 }
 
 MyDB_Page :: ~MyDB_Page () {

@@ -11,8 +11,9 @@ class MyDB_Page;
 typedef shared_ptr <MyDB_Page> MyDB_PagePtr;
 typedef shared_ptr<MyDB_BufferManager> MyDB_BufferManagerPtr;
 typedef shared_ptr<MyDB_Table> MyDB_TablePtr;
+typedef string fileLoc;
 
-class MyDB_Page {
+class MyDB_Page : public enable_shared_from_this<MyDB_Page>  {
     
 public:
     // Mark the dirty bit
@@ -48,25 +49,34 @@ public:
     // Return true if the page is pinned, otherwise return false
     bool isPinned();
     
+    bool isAnonymous();
+    
     // Increase the reference counter by one
     void incRefCounter();
     
     // Decrease the reference counter by one
     void decRefCounter();
     
+    bool hasNoCounter();
+    
     // return PageID
     string getPageID();
     
-    // return index of page frame
-    int getPageFrameIndex();
+    // return the page frame
+    char* getPageFrame();
     
+    // return the address of the actual data
+    pair<fileLoc, int> getAddress();
+        
     // Buffer the data from file to RAM
-    void buffer();
+    void bufferMyself();
     
-    // write the data back to file
-    void writeBack();
+    // Evict the page
+    void evictMyself();
     
-    MyDB_Page(MyDB_BufferManagerPtr bufferManager, pair<MyDB_TablePtr, int> const addressinStorage);
+    void updateMyselfinLRU();
+    
+    MyDB_Page(MyDB_BufferManagerPtr const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous);
     
     ~MyDB_Page();
     
@@ -89,17 +99,17 @@ private:
     // a bit to indicate whether a page is pinned
     bool _pinBit;
     
-    // page ID : used for look-up table for buffer manager and look-up table for LRU
+    // a bit to indicate whether a page is anonymous
+    bool _anonBit;
+    
+    // a unique page ID
     string _pageID;
     
     // the address in storage
-    pair<MyDB_TablePtr, int> _addressinStorage;
+    pair<fileLoc, int> _addressinStorage;
     
     // the address of the page frame where the page is buffered in RAM
-    char* _pageFrame;
-    
-    // the index of page frame where this page is buffered in RAM
-    int _indexofPageFrame;
+     char* _pageFrame;
     
     // the buffer manager
     MyDB_BufferManagerPtr _bufferManager;

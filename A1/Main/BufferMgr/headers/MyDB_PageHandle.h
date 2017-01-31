@@ -38,6 +38,9 @@ public:
     MyDB_PageHandleBase (MyDB_PagePtr pagePointer);
     //MyDB_PagePtr getPagePointer() { return _pagePointer; }
     
+    // unpin the page
+    void unpinPage();
+    
 private:
     
     MyDB_PagePtr _pagePointer;

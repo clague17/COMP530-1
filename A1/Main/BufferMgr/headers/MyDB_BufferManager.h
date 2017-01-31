@@ -58,18 +58,34 @@ public:
     // and any temporary files need to be deleted
     ~MyDB_BufferManager ();
     
+    // assign page frame to a page and return the pageFrame address
     char* allocBuffer (MyDB_PagePtr pagePtr);
     
+    // evict a page and return the page frame to the buffer pool
+    void recyclBuffer (MyDB_PagePtr pagePtr);
+    
+    // write the buffer back to the file
+    void writeBack(MyDB_PagePtr pagePtr);
+    
+    void updateLRUTable(MyDB_PagePtr pagePtr);
     
 private:
     
-    // YOUR STUFF HERE
     size_t _pageSize;
     size_t _numPages;
     string _tempFile;
-    vector<char*> pageFrames;
-    vector<int> availableSlots;
+    
+    // buffer pool to store available page frames
+    vector<char*> availablePageFrames;
+    
+    // the index for the next anonymous page to store in file
+    int tempPageIndex;
+    
+    // a smart pointer to look up table
+    // key: pageID, value: page smart pointer
     id_to_PagePtr_map _pageTable;
+    
+    // a smart pointer to LRU table
     MyDB_LRUTablePtr _lruTable;
     
 };
