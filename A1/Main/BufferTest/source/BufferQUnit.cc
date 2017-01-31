@@ -41,7 +41,7 @@ int main () {
 	// UNIT TEST 1: A BIG ONE!!
 	{
 
-		// create a buffer manager 
+		// create a buffer manager
 		MyDB_BufferManager myMgr (64, 16, "tempDSFSD");
 		MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "foobar");
 
@@ -52,7 +52,7 @@ int main () {
 		writeNums (bytes, 64, 0);
 		pinnedPage->wroteBytes ();
 
-		
+
 		// create a bunch of pinned pages and remember them
 		vector <MyDB_PageHandle> myHandles;
 		for (int i = 1; i < 10; i++) {
@@ -89,7 +89,7 @@ int main () {
 		bytes = (char *) anotherDude->getBytes ();
 		writeSymbols (bytes, 64, 0);
 		anotherDude->wroteBytes ();
-		
+
 		// now do 90 more pages, for which we forget the handle immediately
 		for (int i = 10; i < 100; i++) {
 			cout << "allocating unpinned page\n";
@@ -125,7 +125,7 @@ int main () {
 			writeLetters (bytes, 64, i);
 			temp->wroteBytes ();
 		}
-		
+
 	}
 
 	// UNIT TEST 2

@@ -143,6 +143,7 @@ char* MyDB_BufferManager :: allocBuffer (MyDB_PagePtr pagePtr) {
         availablePageFrames.pop_back();
     }
     // Read data from file
+    _lruTable -> updateLRU(pagePtr -> getPageID(), pagePtr);
     pair<fileLoc, int> address = pagePtr -> getAddress();
     int fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
     lseek(fd, address.second * _pageSize, SEEK_SET);
