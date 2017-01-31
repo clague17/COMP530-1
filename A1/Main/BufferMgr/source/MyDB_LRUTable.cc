@@ -18,21 +18,13 @@ MyDB_PagePtr MyDB_LRUTable :: checkLRU() {
     list_it evicted = _accessHistory.begin();
     
     // Iterate until a page is not pinned
-    while ((*evicted).second -> isPinned()) {
-        evicted = next(evicted,2);
+    while (evicted -> second -> isPinned()) {
+        evicted = next(evicted,1);
     }
-    
-//    // If a unpinned page exists
-//    if (evicted != _accessHistory.end()) {
-//        // Erase it fromt the access history list and the lookup table
-//        MyDB_PagePtr pagePtr = (*evicted).second;
-//        _lookUpTable.erase((*evicted).first);
-//        _accessHistory.erase(evicted);
-//        return pagePtr;
-//    }
-    cout<< "[MyDB_LRUTable :: checkLRU()]" << "The evicted page is " << &(*evicted).second <<endl;
-    cout<< "[MyDB_LRUTable :: checkLRU()]" << "The evicted page ID is " << (*evicted).second -> getPageID() <<endl;
-    return (*evicted).second;
+
+    cout<< "[MyDB_LRUTable :: checkLRU()]" << "The evicted page is " << evicted -> second <<endl;
+    cout<< "[MyDB_LRUTable :: checkLRU()]" << "The evicted page ID is " << evicted -> second -> getPageID() <<endl;
+    return evicted -> second;
 }
 
 void MyDB_LRUTable :: updateLRU(pageID updateMeID, MyDB_PagePtr updateMePtr) {
@@ -42,10 +34,9 @@ void MyDB_LRUTable :: updateLRU(pageID updateMeID, MyDB_PagePtr updateMePtr) {
     // If it's found, erase it from list
     if (it != _lookUpTable.end()) {
         
-        cout<< "[MyDB_LRUTable :: updateLRU] " <<" the iterator to the updated page is " << endl;
-        list_it it_list = it->second;
-        cout<< &it_list <<endl;
+        cout<< "[MyDB_LRUTable :: updateLRU] " <<" remove the node from access history " << endl;
         _accessHistory.erase(it->second);
+        
     }
     
     // Append a new pair to the end of the list
@@ -59,10 +50,13 @@ char* MyDB_LRUTable :: evictItem(pageID evictMeID){
     
     // Find the list iterator for the page in lookup table
     map_it it_map = _lookUpTable.find(evictMeID);
+    
     if (it_map != _lookUpTable.end()) {
+        
         //Get the page frame where the page is buffered
         list_it it_list = it_map -> second;
-        char* pageFrame = ((*it_list).second) -> getPageFrame();
+        char* pageFrame = it_list -> second -> getPageFrame();
+        
         //Erase the page from the list and the map
         _accessHistory.erase(it_list);
         _lookUpTable.erase(it_map);
@@ -74,6 +68,16 @@ char* MyDB_LRUTable :: evictItem(pageID evictMeID){
     return NULL;
 }
 
+void MyDB_LRUTable:: clearLRU() {
+    list_it it = _accessHistory.begin();
+    while (it != _accessHistory.end()) {
+        if (it -> second -> isDirty()) {
+            it -> second -> writeBack();
+        }
+        it = next(it, 1);
+    }
+}
+
 MyDB_LRUTable :: MyDB_LRUTable() {
     
 }
@@ -81,5 +85,14 @@ MyDB_LRUTable :: MyDB_LRUTable() {
 MyDB_LRUTable :: ~MyDB_LRUTable() {
     
 }
+
+//    // If a unpinned page exists
+//    if (evicted != _accessHistory.end()) {
+//        // Erase it fromt the access history list and the lookup table
+//        MyDB_PagePtr pagePtr = (*evicted).second;
+//        _lookUpTable.erase((*evicted).first);
+//        _accessHistory.erase(evicted);
+//        return pagePtr;
+//    }
 
 #endif

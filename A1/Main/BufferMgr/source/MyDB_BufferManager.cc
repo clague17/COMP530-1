@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i) {
     //get the pair of the key if it exists
     string pageID = whichTable -> getName() + whichTable-> getStorageLoc() + to_string(i);
@@ -36,7 +35,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
     }
     //key doesn't exists, create a new handle of the page object and return it
     else {
-        cout << "Page"
+        cout << "Page "
         << whichTable->getName() << " "
         << i
         << " is not in the page table." << endl;
@@ -78,7 +77,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
 
         pagePtr -> markPin();
 
-        cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"mark Pin";
+        cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"mark Pin" <<endl;
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
     //key doesn't exists, create a new handle of the page object and return it
@@ -125,29 +124,23 @@ char* MyDB_BufferManager :: allocBuffer (MyDB_PagePtr pagePtr) {
     if (availablePageFrames.empty()) {
         cout<<"[MyDB_BufferManager :: allocBuffer] " << "There is no free page frame"<<endl;
         MyDB_PagePtr evictedPage = _lruTable -> checkLRU();
-        evictedPage -> unmarkBuffer();
-        if (evictedPage -> isDirty()) {
-            writeBack(evictedPage);
-        }
-        pageFrame = evictedPage -> getPageFrame();
-        cout<<"[MyDB_BufferManager :: allocBuffer] " << "pageFrame address is "<< *pageFrame <<endl;
-
+        evictedPage -> evictMyself();
+        pageFrame = availablePageFrames.back();
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << " buffer Address is " << static_cast<void *>(&pageFrame[0]) << endl;
+        availablePageFrames.pop_back();
     }
     // If there is free page frames
     else {
         cout<<"[MyDB_BufferManager :: allocBuffer] " << "There is free page frame"<<endl;
-        cout<<"[MyDB_BufferManager :: allocBuffer] " << "last pageFrame address is "<< &availablePageFrames.back() <<endl;
-
         pageFrame = availablePageFrames.back();
-        cout<<"[MyDB_BufferManager :: allocBuffer] " << "pageFrame address is "<< pageFrame <<endl;
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << " buffer Address is " << static_cast<void *>(&pageFrame[0]) << endl;
+
         availablePageFrames.pop_back();
     }
-    // Read data from file
-    _lruTable -> updateLRU(pagePtr -> getPageID(), pagePtr);
     pair<fileLoc, int> address = pagePtr -> getAddress();
     int fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
     lseek(fd, address.second * _pageSize, SEEK_SET);
-    read(fd, pagePtr -> getPageFrame(), _pageSize);
+    read(fd, pageFrame, _pageSize);
     return pageFrame;
 }
 
@@ -168,6 +161,12 @@ void MyDB_BufferManager:: updateLRUTable(MyDB_PagePtr pagePtr) {
     _lruTable -> updateLRU(pagePtr -> getPageID(), pagePtr);
 }
 
+void MyDB_BufferManager:: clearBuffer() {
+    _lruTable -> clearLRU();
+    for (int i = int(_numPages - 1); i >= 0; i--) {
+        delete[] allPageFrames[i];
+    }
+}
 MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, string tempFile) {
 
     _pageSize = pageSize;
@@ -175,17 +174,19 @@ MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, stri
     _tempFile = tempFile;
     tempPageIndex = 0;
 
-    //Initialize buffer pool (available page frames)
     for (int i = int(_numPages - 1); i >= 0; i--) {
-        availablePageFrames.push_back(new char[pageSize]);
-        cout<<"[MyDB_BufferManager :: MyDB_BufferManager] "<< "allocate buffer "<< &availablePageFrames.back() <<endl;
+        allPageFrames.push_back(new char[_pageSize]);
     }
+
+    availablePageFrames = allPageFrames;
 
     _lruTable = make_shared<MyDB_LRUTable>();
 
 }
 
 MyDB_BufferManager :: ~MyDB_BufferManager () {
+
+    clearBuffer();
 
 }
 
