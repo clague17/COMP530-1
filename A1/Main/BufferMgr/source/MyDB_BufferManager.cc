@@ -25,7 +25,13 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
         << endl;
         cout << "Create a handle and returned."
         << endl;
+        
+        cout<<"[MyDB_BufferManager :: getPage] "<<"the page pointer is";
+        cout<< it->second <<endl;
         MyDB_PagePtr pagePtr = it->second;
+        
+        cout<<"[MyDB_BufferManager :: getPage] "<<"get page pointer"<<endl;
+        
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
     //key doesn't exists, create a new handle of the page object and return it
@@ -36,7 +42,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
         << "is not in the page table." << endl;
         cout << "Made a new page Object returned a handle to it."
         << endl;
-        MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(shared_from_this(), make_pair(whichTable->getStorageLoc(), i), pageID, false);
+        MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(this, make_pair(whichTable->getStorageLoc(), i), pageID, false);
         _pageTable[pageID] = pagePtr;
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
@@ -45,7 +51,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
 MyDB_PageHandle MyDB_BufferManager :: getPage () {
     string pageID = _tempFile + to_string(tempPageIndex);
     //Create a page Pointer
-    MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(shared_from_this(), make_pair(_tempFile, tempPageIndex),pageID, true);
+    MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(this, make_pair(_tempFile, tempPageIndex),pageID, true);
     //Increate index of page in temp file
     tempPageIndex++;
     //return a page handle
@@ -65,28 +71,45 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
         << endl;
         cout << "Create a handle and returned."
         << endl;
+        
         MyDB_PagePtr pagePtr = it->second;
+        cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"the page pointer is " << it->second <<endl;
+        cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"the page pointer is " << pagePtr <<endl;
+       
         pagePtr -> markPin();
+        
+        cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"mark Pin";
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
     //key doesn't exists, create a new handle of the page object and return it
     else {
-        cout << "Page"
+        cout<< "MyDB_BufferManager :: getPinnedPage : " <<  "Page "
         << whichTable->getName() << " "
         << i
-        << "is not in the page table." << endl;
+        << " is not in the page table." << endl;
         cout << "Made a new page Object returned a handle to it."
         << endl;
-        MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(shared_from_this(), make_pair(whichTable->getStorageLoc(), i), pageID, false);
+        
+        cout<< "[MyDB_BufferManager :: getPinnedPage] " << "Create a page object"<<endl;
+        MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(this, make_pair(whichTable->getStorageLoc(), i), pageID, false);
+        
+        cout<<"[MyDB_BufferManager :: getPinnedPage] "<<"the page pointer is " << pagePtr <<endl;
+
+        
+        cout<< "[MyDB_BufferManager :: getPinnedPage] " << "markPin" <<endl;
         pagePtr->markPin();
+        
+        cout<< "[MyDB_BufferManager :: getPinnedPage] " << "insert into lookup table" <<endl;
         _pageTable[pageID] = pagePtr;
+        
+        cout<< "[MyDB_BufferManager :: getPinnedPage] " << "return a page handle"<<endl;
         return make_shared<MyDB_PageHandleBase>(pagePtr);
     }
 }
 
 MyDB_PageHandle MyDB_BufferManager :: getPinnedPage () {
     string pageID = _tempFile + to_string(tempPageIndex);
-    MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(shared_from_this(), make_pair(_tempFile, tempPageIndex),pageID, true);
+    MyDB_PagePtr pagePtr = make_shared<MyDB_Page>(this, make_pair(_tempFile, tempPageIndex),pageID, true);
     tempPageIndex++;
     pagePtr -> markPin();
     return make_shared<MyDB_PageHandleBase>(pagePtr);
@@ -100,22 +123,29 @@ char* MyDB_BufferManager :: allocBuffer (MyDB_PagePtr pagePtr) {
     char* pageFrame;
     // If there is no free page frames
     if (availablePageFrames.empty()) {
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << "There is no free page frame"<<endl;
         MyDB_PagePtr evictedPage = _lruTable -> checkLRU();
         evictedPage -> unmarkBuffer();
         if (evictedPage -> isDirty()) {
             writeBack(evictedPage);
         }
         pageFrame = evictedPage -> getPageFrame();
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << "pageFrame address is "<< *pageFrame <<endl;
+
     }
     // If there is free page frames
     else {
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << "There is free page frame"<<endl;
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << "last pageFrame address is "<< &availablePageFrames.back() <<endl;
+
         pageFrame = availablePageFrames.back();
+        cout<<"[MyDB_BufferManager :: allocBuffer] " << "pageFrame address is "<< pageFrame <<endl;
         availablePageFrames.pop_back();
     }
     // Read data from file
     pair<fileLoc, int> address = pagePtr -> getAddress();
     int fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
-    lseek(fd, (address.second - 1) * _pageSize, SEEK_SET);
+    lseek(fd, address.second * _pageSize, SEEK_SET);
     read(fd, pagePtr -> getPageFrame(), _pageSize);
     return pageFrame;
 }
@@ -129,7 +159,7 @@ void MyDB_BufferManager:: recyclBuffer(MyDB_PagePtr pagePtr) {
 void MyDB_BufferManager:: writeBack(MyDB_PagePtr pagePtr) {
     pair<fileLoc, int> address = pagePtr -> getAddress();
     int fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
-    lseek(fd, (address.second - 1) * _pageSize, SEEK_SET);
+    lseek(fd, address.second * _pageSize, SEEK_SET);
     write(fd, pagePtr -> getPageFrame(), _pageSize);
 }
 
@@ -142,11 +172,12 @@ MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, stri
     _pageSize = pageSize;
     _numPages = numPages;
     _tempFile = tempFile;
-    tempPageIndex = 1;
+    tempPageIndex = 0;
     
     //Initialize buffer pool (available page frames)
     for (int i = int(_numPages - 1); i >= 0; i--) {
         availablePageFrames.push_back(new char[pageSize]);
+        cout<<"[MyDB_BufferManager :: MyDB_BufferManager] "<< "allocate buffer "<< &availablePageFrames.back() <<endl;
     }
     
     _lruTable = make_shared<MyDB_LRUTable>();

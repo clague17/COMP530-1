@@ -18,7 +18,7 @@ typedef shared_ptr<MyDB_BufferManager> MyDB_BufferManagerPtr ;
 typedef unordered_map<string, MyDB_PagePtr> id_to_PagePtr_map;
 
 
-class MyDB_BufferManager : public enable_shared_from_this<MyDB_BufferManager> {
+class MyDB_BufferManager {
     
 public:
     

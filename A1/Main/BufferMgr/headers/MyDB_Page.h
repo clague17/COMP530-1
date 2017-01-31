@@ -76,7 +76,7 @@ public:
     
     void updateMyselfinLRU();
     
-    MyDB_Page(MyDB_BufferManagerPtr const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous);
+    MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous);
     
     ~MyDB_Page();
     
@@ -112,7 +112,7 @@ private:
      char* _pageFrame;
     
     // the buffer manager
-    MyDB_BufferManagerPtr _bufferManager;
+    MyDB_BufferManager* _bufferManager;
 };
 
 #endif

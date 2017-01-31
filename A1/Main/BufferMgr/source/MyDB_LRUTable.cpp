@@ -5,6 +5,7 @@
 #ifndef LRU_TABLE_C
 #define LRU_TABLE_C
 
+#include <iostream>
 #include "MyDB_LRUTable.h"
 
 
@@ -38,6 +39,10 @@ void MyDB_LRUTable :: updateLRU(pageID updateMeID, MyDB_PagePtr updateMePtr) {
     // Get the list iterator for page in lookup table
     // If it's found, erase it from list
     if (it != _lookUpTable.end()) {
+        
+        cout<< "[MyDB_LRUTable :: updateLRU] " <<" the iterator to the updated page is " << endl;
+        list_it it_list = it->second;
+        cout<< &it_list <<endl;
         _accessHistory.erase(it->second);
     }
     
@@ -45,7 +50,7 @@ void MyDB_LRUTable :: updateLRU(pageID updateMeID, MyDB_PagePtr updateMePtr) {
     _accessHistory.push_back(make_pair(updateMeID, updateMePtr));
     
     // Update the value in the lookup table (if not exists, create a new pair of key and value)
-    _lookUpTable[updateMeID] = _accessHistory.end();
+    _lookUpTable[updateMeID] = --_accessHistory.end();
 }
 
 char* MyDB_LRUTable :: evictItem(pageID evictMeID){

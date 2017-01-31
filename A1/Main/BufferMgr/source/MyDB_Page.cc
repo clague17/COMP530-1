@@ -1,6 +1,7 @@
 #ifndef PAGE_C
 #define PAGE_C
 
+#include <iostream>
 #include "MyDB_Page.h"
 #include "MyDB_BufferManager.h"
 #include <string>
@@ -33,6 +34,7 @@ void MyDB_Page :: unmarkBuffer() {
 
 void MyDB_Page :: markPin() {
     _pinBit = true;
+    cout<<"[MyDB_Page :: markPin()] "<< "markPin"<<endl;
 }
 
 void MyDB_Page :: unmarkPin() {
@@ -96,16 +98,19 @@ pair<fileLoc, int> MyDB_Page::getAddress(){
     return _addressinStorage;
 }
 
-MyDB_Page :: MyDB_Page(MyDB_BufferManagerPtr const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous){
+MyDB_Page :: MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous){
+    cout<<"[MyDB_Page :: MyDB_Page] "<< "Calling constructor."<<endl;
     _bufferManager = bufferManager;
     _addressinStorage = addressinStorage;
     _pageID = pageID;
     _dirtyBit = false;
     _hitBit = false;
     _anonBit = isAnonymous;
+    _refCounter = 0;
 }
 
 MyDB_Page :: ~MyDB_Page () {
-    
+    cout<<"[MyDB_Page :: ~MyDB_Page] "<< "Calling destructor."<<endl;
+
 }
 #endif
