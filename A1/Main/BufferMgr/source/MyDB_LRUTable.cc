@@ -21,9 +21,6 @@ MyDB_PagePtr MyDB_LRUTable :: checkLRU() {
     while (evicted -> second -> isPinned()) {
         evicted = next(evicted,1);
     }
-
-    cout<< "[MyDB_LRUTable :: checkLRU()]" << "The evicted page is " << evicted -> second <<endl;
-    cout<< "[MyDB_LRUTable :: checkLRU()]" << "The evicted page ID is " << evicted -> second -> getPageID() <<endl;
     return evicted -> second;
 }
 
@@ -34,7 +31,6 @@ void MyDB_LRUTable :: updateLRU(pageID updateMeID, MyDB_PagePtr updateMePtr) {
     // If it's found, erase it from list
     if (it != _lookUpTable.end()) {
         
-        cout<< "[MyDB_LRUTable :: updateLRU] " <<" remove the node from access history " << endl;
         _accessHistory.erase(it->second);
         
     }
@@ -64,7 +60,7 @@ char* MyDB_LRUTable :: evictItem(pageID evictMeID){
         // return page frame
         return pageFrame;
     }
-    cout<< "[MyDB_LRUTable :: evictItem()]" << "Writing a null page frame back !!!" << endl;
+    cout<< "No such a record in LRU. "<< endl;
     return NULL;
 }
 
@@ -86,13 +82,5 @@ MyDB_LRUTable :: ~MyDB_LRUTable() {
     
 }
 
-//    // If a unpinned page exists
-//    if (evicted != _accessHistory.end()) {
-//        // Erase it fromt the access history list and the lookup table
-//        MyDB_PagePtr pagePtr = (*evicted).second;
-//        _lookUpTable.erase((*evicted).first);
-//        _accessHistory.erase(evicted);
-//        return pagePtr;
-//    }
 
 #endif

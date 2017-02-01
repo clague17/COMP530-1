@@ -34,7 +34,6 @@ void MyDB_Page :: unmarkBuffer() {
 
 void MyDB_Page :: markPin() {
     _pinBit = true;
-    cout<<"[MyDB_Page :: markPin()] "<< "markPin"<<endl;
 }
 
 void MyDB_Page :: unmarkPin() {
@@ -107,7 +106,6 @@ void MyDB_Page:: writeBack() {
 }
 
 MyDB_Page :: MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous){
-    cout<<"[MyDB_Page :: MyDB_Page] "<< "Calling constructor."<<endl;
     _bufferManager = bufferManager;
     _addressinStorage = addressinStorage;
     _pageID = pageID;
@@ -116,10 +114,10 @@ MyDB_Page :: MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, i
     _bufferBit = false;
     _anonBit = isAnonymous;
     _refCounter = 0;
+    _pageFrame = NULL;
 }
 
 MyDB_Page :: ~MyDB_Page () {
-    cout<<"[MyDB_Page :: ~MyDB_Page] "<< "Calling destructor."<<endl;
 
 }
 #endif

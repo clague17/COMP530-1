@@ -13,8 +13,6 @@ void *MyDB_PageHandleBase :: getBytes () {
     }
     // Update the page in the LRU table
     _pagePointer -> updateMyselfinLRU();
-    char* address = _pagePointer -> getPageFrame();
-    cout<< "[MyDB_PageHandleBase :: getBytes] " << " buffer Address is " << static_cast<void *>(&address[0]) << endl;
     return _pagePointer -> getPageFrame();
 }
 

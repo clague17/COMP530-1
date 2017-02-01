@@ -81,6 +81,7 @@ private:
     // buffer pool to store available page frames
     vector<char*> availablePageFrames;
     
+    // all page frames
     vector<char*> allPageFrames;
     
     // the index for the next anonymous page to store in file

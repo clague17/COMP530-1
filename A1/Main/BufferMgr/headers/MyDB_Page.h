@@ -75,8 +75,10 @@ public:
     // Evict the page
     void evictMyself();
 
+    // Update this page in LRU table; Called when getByte() is called in handle.
     void updateMyselfinLRU();
 
+    // Write the data back to disk
     void writeBack();
 
     MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, int> const& addressinStorage, string const& pageID, bool isAnonymous);
@@ -84,8 +86,6 @@ public:
     ~MyDB_Page();
 
 private:
-    // the size of page
-    size_t _pageSize;
 
     // the counter of handles to the page object
     int _refCounter;

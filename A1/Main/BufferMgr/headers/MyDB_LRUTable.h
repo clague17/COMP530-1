@@ -38,6 +38,8 @@ public:
     // Called by buffer manager to evict a anonymous page
     char* evictItem(pageID evictMeID);
 
+    // Clear all the LRU records and write data back to dick if it's dirty
+    // Called before buffer manager is destructed
     void clearLRU();
 
     MyDB_LRUTable();
