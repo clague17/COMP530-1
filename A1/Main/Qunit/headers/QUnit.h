@@ -20,6 +20,7 @@
 #define _QUNIT_H_
 
 #include <sstream>
+#include <iostream>
 #include <string>
 
 #define QUNIT_IS_EQUAL(expr1,expr2)     QUNIT_COMPARE(true,true,expr1,expr2)

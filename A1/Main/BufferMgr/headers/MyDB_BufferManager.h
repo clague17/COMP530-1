@@ -84,6 +84,8 @@ private:
     // all page frames
     vector<char*> allPageFrames;
     
+    unordered_map<string, int> fileTable;
+    
     // the index for the next anonymous page to store in file
     int tempPageIndex;
     

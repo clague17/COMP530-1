@@ -111,6 +111,7 @@ MyDB_Page :: MyDB_Page(MyDB_BufferManager* const& bufferManager, pair<fileLoc, i
     _pageID = pageID;
     _dirtyBit = false;
     _hitBit = false;
+    _pinBit = false;
     _bufferBit = false;
     _anonBit = isAnonymous;
     _refCounter = 0;

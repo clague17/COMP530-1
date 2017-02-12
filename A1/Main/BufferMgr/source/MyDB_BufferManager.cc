@@ -96,7 +96,17 @@ char* MyDB_BufferManager :: allocBuffer (MyDB_PagePtr pagePtr) {
         availablePageFrames.pop_back();
     }
     pair<fileLoc, int> address = pagePtr -> getAddress();
-    int fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
+    unordered_map<string, int>:: iterator it = fileTable.find(address.first);
+    int fd;
+    if (it != fileTable.end()) {
+        fd = it -> second;
+    } else {
+        fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
+        if (fd < 0) {
+            cout<< "Error : Fail to open file."<<endl;
+        }
+        fileTable[address.first] = fd;
+    }
     lseek(fd, address.second * _pageSize, SEEK_SET);
     read(fd, pageFrame, _pageSize);
     return pageFrame;
@@ -110,7 +120,17 @@ void MyDB_BufferManager:: recyclBuffer(MyDB_PagePtr pagePtr) {
 
 void MyDB_BufferManager:: writeBack(MyDB_PagePtr pagePtr) {
     pair<fileLoc, int> address = pagePtr -> getAddress();
-    int fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
+    unordered_map<string, int>:: iterator it = fileTable.find(address.first);
+    int fd;
+    if (it != fileTable.end()) {
+        fd = it -> second;
+    } else {
+        fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
+        if (fd < 0) {
+            cout<< "Error : Fail to open file."<<endl;
+        }
+        fileTable[address.first] = fd;
+    }
     lseek(fd, address.second * _pageSize, SEEK_SET);
     write(fd, pagePtr -> getPageFrame(), _pageSize);
 }
