@@ -104,8 +104,9 @@ char* MyDB_BufferManager :: allocBuffer (MyDB_PagePtr pagePtr) {
         fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
         if (fd < 0) {
             cout<< "Error : Fail to open file."<<endl;
+        } else {
+            fileTable[address.first] = fd;
         }
-        fileTable[address.first] = fd;
     }
     lseek(fd, address.second * _pageSize, SEEK_SET);
     read(fd, pageFrame, _pageSize);
@@ -128,8 +129,9 @@ void MyDB_BufferManager:: writeBack(MyDB_PagePtr pagePtr) {
         fd = open(address.first.c_str(), O_CREAT | O_RDWR | O_FSYNC, 0666);
         if (fd < 0) {
             cout<< "Error : Fail to open file."<<endl;
+        } else {
+            fileTable[address.first] = fd;
         }
-        fileTable[address.first] = fd;
     }
     lseek(fd, address.second * _pageSize, SEEK_SET);
     write(fd, pagePtr -> getPageFrame(), _pageSize);
@@ -165,6 +167,13 @@ MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, stri
 MyDB_BufferManager :: ~MyDB_BufferManager () {
 
     clearBuffer();
+    
+    unordered_map<string, int> :: iterator it = fileTable.begin();
+    while (it != fileTable.end()) {
+        close(it -> second);
+        it++;
+
+    }
 
 }
 
